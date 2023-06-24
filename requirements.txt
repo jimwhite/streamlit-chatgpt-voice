@@ -1,0 +1,5 @@
+openai
+beautifulsoup4
+mistune
+pytz
+audio-recorder-streamlit
