@@ -165,9 +165,9 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
         #st.write(f"Message received {chunk_time:.2f} seconds after request: {chunk_message}")  # print the delay and text
 
         #st.markdown(f'*{results}*')
-        result = "".join(collected_messages).strip()
-        result = result.replace('\n','')
-        result_textarea.markdown(f'*{result}*')
+        #result = "".join(collected_messages).strip()
+        #result = result.replace('\n','')
+        result_textarea.markdown(f'*{collected_messages}*')
     
     st.markdown(f"Full response received {chunk_time:.2f} seconds after request")
     full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
