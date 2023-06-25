@@ -132,7 +132,7 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     # streaming response
     result_textarea = st.empty()
     results=[]
-    for responses in openai.Completion.create(model=model, messages=conversation, stream=True):
+    for responses in openai.Completion.create(model=model, prompt=conversation, stream=True):
 #    for responses in openai.ChatCompletion.create(model=model, messages=conversation, stream=True):
         #results.append(str(responses.choices[0]))
         results.append(responses.choices[0].text)
