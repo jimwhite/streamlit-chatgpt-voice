@@ -130,16 +130,47 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     #response = openai.ChatCompletion.create(model=model, messages=conversation)
 
     # streaming response
-    result_textarea = st.empty()
-    results=[]
-    for responses in openai.Completion.create(model=model, prompt=conversation, stream=True):
+    #result_textarea = st.empty()
+    #results=[]
+    #for responses in openai.Completion.create(model=model, prompt=conversation, stream=True):
 #    for responses in openai.ChatCompletion.create(model=model, messages=conversation, stream=True):
         #results.append(str(responses.choices[0]))
-        results.append(responses.choices[0].text)
+     #   results.append(responses.choices[0].text)
         #st.markdown(f'*{results}*')
-        result = "".join(results).strip()
-        result = result.replace('\n','')
-        result_textarea.markdown(f'*{result}*')
+     #   result = "".join(results).strip()
+     #   result = result.replace('\n','')
+     #   result_textarea.markdown(f'*{result}*')
+
+        
+    # record the time before the request is sent
+    start_time = time.time()
+
+    response = openai.ChatCompletion.create(
+        model='gpt-3.5-turbo',
+        messages=conversation,
+        temperature=0.5,
+        stream=True  # again, we set stream=True
+    )
+    
+    # create variables to collect the stream of chunks
+    collected_chunks = []
+    collected_messages = []
+    # iterate through the stream of events
+    for chunk in response:
+        chunk_time = time.time() - start_time  # calculate the time delay of the chunk
+        collected_chunks.append(chunk)  # save the event response
+        chunk_message = chunk['choices'][0]['delta']  # extract the message
+        collected_messages.append(chunk_message)  # save the message
+        print(f"Message received {chunk_time:.2f} seconds after request: {chunk_message}")  # print the delay and text
+
+    # print the time delay and text received
+    print(f"Full response received {chunk_time:.2f} seconds after request")
+    full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
+    print(f"Full conversation received: {full_reply_content}")
+
+
+
+
         
     #return response
     #return response['choices'][0]['message']['content']
