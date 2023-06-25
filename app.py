@@ -22,16 +22,6 @@ def generate_filename(prompt, file_type):
     safe_prompt = "".join(x for x in prompt if x.isalnum())[:45]
     return f"{safe_date_time}_{safe_prompt}.{file_type}"
 
-def chat_with_model(prompt, document_section):
-    model = model_choice
-    conversation = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
-    conversation.append({'role': 'user', 'content': prompt})
-    if len(document_section)>0:
-        conversation.append({'role': 'assistant', 'content': document_section})
-    response = openai.ChatCompletion.create(model=model, messages=conversation)
-    #return response
-    return response['choices'][0]['message']['content']
-    
 def transcribe_audio(openai_key, file_path, model):
     OPENAI_API_URL = "https://api.openai.com/v1/audio/transcriptions"
     headers = {
@@ -131,6 +121,16 @@ def read_file_content(file,max_length):
         return ""
 
 
+def chat_with_model(prompt, document_section):
+    model = model_choice
+    conversation = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
+    conversation.append({'role': 'user', 'content': prompt})
+    if len(document_section)>0:
+        conversation.append({'role': 'assistant', 'content': document_section})
+    response = openai.ChatCompletion.create(model=model, messages=conversation)
+    #return response
+    return response['choices'][0]['message']['content']
+    
 
 def chat_with_file_contents(prompt, file_content):
     conversation = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
@@ -140,26 +140,26 @@ def chat_with_file_contents(prompt, file_content):
     response = openai.ChatCompletion.create(model=model_choice, messages=conversation)
     return response['choices'][0]['message']['content']
         
-
-# Sidebar and global
-openai.api_key = os.getenv('OPENAI_KEY')
-st.set_page_config(page_title="GPT Streamlit Document Reasoner",layout="wide")
-menu = ["htm", "txt", "xlsx", "csv", "md", "py"]  #619
-choice = st.sidebar.selectbox("Output File Type:", menu)
-model_choice = st.sidebar.radio("Select Model:", ('gpt-3.5-turbo', 'gpt-3.5-turbo-0301'))
-
-# Audio, transcribe, GPT:
-filename = save_and_play_audio(audio_recorder)
-if filename is not None:
-    transcription = transcribe_audio(openai.api_key, filename, "whisper-1")
-    st.write(transcription)
-    gptOutput = chat_with_model(transcription, '') # *************************************
-    filename = generate_filename(transcription, choice)
-    create_file(filename, transcription, gptOutput)
-    st.sidebar.markdown(get_table_download_link(filename), unsafe_allow_html=True)
-
-
+    
 def main():
+    # Sidebar and global
+    openai.api_key = os.getenv('OPENAI_KEY')
+    st.set_page_config(page_title="GPT Streamlit Document Reasoner",layout="wide")
+    menu = ["htm", "txt", "xlsx", "csv", "md", "py"]  #619
+    choice = st.sidebar.selectbox("Output File Type:", menu)
+    model_choice = st.sidebar.radio("Select Model:", ('gpt-3.5-turbo', 'gpt-3.5-turbo-0301'))
+    
+    # Audio, transcribe, GPT:
+    filename = save_and_play_audio(audio_recorder)
+    if filename is not None:
+        transcription = transcribe_audio(openai.api_key, filename, "whisper-1")
+        st.write(transcription)
+        gptOutput = chat_with_model(transcription, '') # *************************************
+        filename = generate_filename(transcription, choice)
+        create_file(filename, transcription, gptOutput)
+        st.sidebar.markdown(get_table_download_link(filename), unsafe_allow_html=True)
+
+
     user_prompt = st.text_area("Enter prompts, instructions & questions:", '', height=100)
 
     collength, colupload = st.columns([2,3])  # adjust the ratio as needed
