@@ -121,7 +121,7 @@ def read_file_content(file,max_length):
         return ""
 
 
-def chat_with_model(prompt, document_section):
+def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     model = model_choice
     conversation = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
     conversation.append({'role': 'user', 'content': prompt})
@@ -132,7 +132,7 @@ def chat_with_model(prompt, document_section):
     return response['choices'][0]['message']['content']
     
 
-def chat_with_file_contents(prompt, file_content):
+def chat_with_file_contents(prompt, file_content, model_choice='gpt-3.5-turbo'):
     conversation = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
     conversation.append({'role': 'user', 'content': prompt})
     if len(file_content)>0:
@@ -154,7 +154,7 @@ def main():
     if filename is not None:
         transcription = transcribe_audio(openai.api_key, filename, "whisper-1")
         st.write(transcription)
-        gptOutput = chat_with_model(transcription, '') # *************************************
+        gptOutput = chat_with_model(transcription, '', model_choice) # *************************************
         filename = generate_filename(transcription, choice)
         create_file(filename, transcription, gptOutput)
         st.sidebar.markdown(get_table_download_link(filename), unsafe_allow_html=True)
@@ -190,7 +190,7 @@ def main():
             else:
                 if st.button(f"Chat about Section {i+1}"):
                     st.write('Reasoning with your inputs...')
-                    response = chat_with_model(user_prompt, section) # *************************************
+                    response = chat_with_model(user_prompt, section, model_choice) # *************************************
                     st.write('Response:')
                     st.write(response)
                     document_responses[i] = response
@@ -200,7 +200,7 @@ def main():
 
     if st.button('💬 Chat'):
         st.write('Reasoning with your inputs...')
-        response = chat_with_model(user_prompt, ''.join(list(document_sections))) # *************************************
+        response = chat_with_model(user_prompt, ''.join(list(document_sections,)), model_choice) # *************************************
         st.write('Response:')
         st.write(response)
         
