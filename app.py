@@ -121,7 +121,6 @@ def read_file_content(file,max_length):
     else:
         return ""
 
-
 def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     model = model_choice
     conversation = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
@@ -129,7 +128,6 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     if len(document_section)>0:
         conversation.append({'role': 'assistant', 'content': document_section})
 
-        
     # iterate through the stream of events
     start_time = time.time()
     response = openai.ChatCompletion.create(
@@ -147,13 +145,11 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
         collected_messages.append(chunk_message)  # save the message
         content=chunk["choices"][0].get("delta",{}).get("content")
         st.write(f'*{content}*')
-    st.markdown(f"Full response received {chunk_time:.2f} seconds after request")
+    st.write(f"Full response received {chunk_time:.2f} seconds after request")
     full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
-    st.markdown(f"Full conversation received: {full_reply_content}")
+    st.write(f"Full conversation received: {full_reply_content}")
     return full_reply_content
 
-    
-    
 def chat_with_file_contents(prompt, file_content, model_choice='gpt-3.5-turbo'):
     conversation = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
     conversation.append({'role': 'user', 'content': prompt})
