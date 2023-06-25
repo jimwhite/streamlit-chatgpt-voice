@@ -140,10 +140,9 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
         #result = "".join(results).strip()
         #result = result.replace('\n','')
         
-
     #return response
     #return response['choices'][0]['message']['content']
-    return results
+    return result_textarea
     
 
 def chat_with_file_contents(prompt, file_content, model_choice='gpt-3.5-turbo'):
