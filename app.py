@@ -134,11 +134,12 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     results=[]
     for responses in openai.ChatCompletion.create(model=model, messages=conversation, stream=True):
         results.append(str(responses.choices[0]))
-        st.markdown(f'*{results}*')
+        #st.markdown(f'*{results}*')
+        result_textarea.markdown(f'*{result}*')
         
         #result = "".join(results).strip()
         #result = result.replace('\n','')
-        #result_textarea.markdown(f'*{result}*')
+        
 
     #return response
     #return response['choices'][0]['message']['content']
