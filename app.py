@@ -146,7 +146,7 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
         chunk_message = chunk['choices'][0]['delta']  # extract the message
         collected_messages.append(chunk_message)  # save the message
         content=chunk["choices"][0].get("delta",{}).get("content")
-        st.markdown(f'*{content}*')
+        st.write(f'*{content}*')
     st.markdown(f"Full response received {chunk_time:.2f} seconds after request")
     full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
     st.markdown(f"Full conversation received: {full_reply_content}")
