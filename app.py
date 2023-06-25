@@ -127,7 +127,17 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     conversation.append({'role': 'user', 'content': prompt})
     if len(document_section)>0:
         conversation.append({'role': 'assistant', 'content': document_section})
-    response = openai.ChatCompletion.create(model=model, messages=conversation)
+    #response = openai.ChatCompletion.create(model=model, messages=conversation)
+
+    # streaming response
+    result_textarea = st.empty()
+    results=[]
+    for responses in openai.ChatCompletion.create(model=model, messages=conversation, stream=True)
+        results.append(responses.choices[0].text)
+        result = "".join(results).strip()
+        result = result.replace('\n','')
+        result_textarea.markdown(f'*{result}*')
+
     #return response
     return response['choices'][0]['message']['content']
     
