@@ -167,7 +167,7 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
         #st.markdown(f'*{results}*')
         #result = "".join(collected_messages).strip()
         #result = result.replace('\n','')
-        st.markdown(f'*{collected_messages}*')
+        st.markdown(f'*{chunk_message}*')
     
     st.markdown(f"Full response received {chunk_time:.2f} seconds after request")
     full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
