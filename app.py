@@ -162,20 +162,13 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
         collected_chunks.append(chunk)  # save the event response
         chunk_message = chunk['choices'][0]['delta']  # extract the message
         collected_messages.append(chunk_message)  # save the message
-        print(f"Message received {chunk_time:.2f} seconds after request: {chunk_message}")  # print the delay and text
-
-    # print the time delay and text received
-    print(f"Full response received {chunk_time:.2f} seconds after request")
+        st.write(f"Message received {chunk_time:.2f} seconds after request: {chunk_message}")  # print the delay and text
+    st.write(f"Full response received {chunk_time:.2f} seconds after request")
     full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
-    print(f"Full conversation received: {full_reply_content}")
-
-
-
-
-        
+    st.write(f"Full conversation received: {full_reply_content}")
     #return response
     #return response['choices'][0]['message']['content']
-    return results
+    return full_reply_content
     
 
 def chat_with_file_contents(prompt, file_content, model_choice='gpt-3.5-turbo'):
