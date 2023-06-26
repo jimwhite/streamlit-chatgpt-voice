@@ -265,7 +265,8 @@ def main():
         if next_action=='search':
             file_content_area = st.text_area("File Contents:", file_contents, height=500)
             st.write('Reasoning with your inputs...')
-            response = chat_with_file_contents(user_prompt, file_contents)
+            #response = chat_with_file_contents(user_prompt, file_contents)
+            response = chat_with_model(user_prompt, file_contents, model_choice)
             st.write('Response:')
             st.write(response)
             filename = generate_filename(file_content_area, choice)
