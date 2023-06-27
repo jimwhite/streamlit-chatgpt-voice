@@ -155,12 +155,14 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
             # join method to concatenate the elements of the list 
             # into a single string, 
             # then strip out any empty strings
-
-        report.append(content)
-        if len(content) > 0:
-            result = "".join(report).strip()
-            result = result.replace("\n", "")        
-            res_box.markdown(f'*{result}*') 
+        try:
+            report.append(content)
+            if len(content) > 0:
+                result = "".join(report).strip()
+                result = result.replace("\n", "")        
+                res_box.markdown(f'*{result}*') 
+        except:
+            st.write('.')
         
     full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
     #st.write(f"Full conversation received: {full_reply_content}")
