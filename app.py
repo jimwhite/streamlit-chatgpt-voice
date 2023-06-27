@@ -138,23 +138,25 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     collected_chunks = []
     collected_messages = []
 
-    
-    #for chunk in response:
-        #collected_chunks.append(chunk)  # save the event response
-        #chunk_message = chunk['choices'][0]['delta']  # extract the message
-        #collected_messages.append(chunk_message)  # save the message
-        #content=chunk["choices"][0].get("delta",{}).get("content")
-            # join method to concatenate the elements of the list 
-            # into a single string, 
-            # then strip out any empty strings
-
-    for resp in openai.ChatCompletion.create(
+    for chunk in openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=conversation,
         temperature=0.5,
         stream=True  
     ):
-        report.append(resp)
+        
+    #for chunk in response:
+        collected_chunks.append(chunk)  # save the event response
+        chunk_message = chunk['choices'][0]['delta']  # extract the message
+        collected_messages.append(chunk_message)  # save the message
+        
+        content=chunk["choices"][0].get("delta",{}).get("content")
+        
+            # join method to concatenate the elements of the list 
+            # into a single string, 
+            # then strip out any empty strings
+
+        report.append(content)
         result = "".join(report).strip()
         result = result.replace("\n", "")        
         res_box.markdown(f'*{result}*') 
