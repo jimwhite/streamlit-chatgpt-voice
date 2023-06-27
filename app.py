@@ -134,17 +134,12 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     
     report = []
     res_box = st.empty()
-    response = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
-        messages=conversation,
-        temperature=0.5,
-        stream=True  
-    )
+
     collected_chunks = []
     collected_messages = []
 
     
-    for chunk in response:
+    #for chunk in response:
         #collected_chunks.append(chunk)  # save the event response
         #chunk_message = chunk['choices'][0]['delta']  # extract the message
         #collected_messages.append(chunk_message)  # save the message
@@ -153,7 +148,13 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
             # into a single string, 
             # then strip out any empty strings
 
-        report.append(chunk.choices[0].text)
+    for resp in openai.ChatCompletion.create(
+        model='gpt-3.5-turbo',
+        messages=conversation,
+        temperature=0.5,
+        stream=True  
+    ):
+        report.append(resp.choices[0].text)
         result = "".join(report).strip()
         result = result.replace("\n", "")        
         res_box.markdown(f'*{result}*') 
