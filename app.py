@@ -154,7 +154,7 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
         temperature=0.5,
         stream=True  
     ):
-        report.append(resp.choices[0].text)
+        report.append(resp)
         result = "".join(report).strip()
         result = result.replace("\n", "")        
         res_box.markdown(f'*{result}*') 
