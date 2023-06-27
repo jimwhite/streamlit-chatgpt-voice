@@ -157,9 +157,10 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
             # then strip out any empty strings
 
         report.append(content)
-        result = "".join(report).strip()
-        result = result.replace("\n", "")        
-        res_box.markdown(f'*{result}*') 
+        if len(content) > 0:
+            result = "".join(report).strip()
+            result = result.replace("\n", "")        
+            res_box.markdown(f'*{result}*') 
         
     full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
     #st.write(f"Full conversation received: {full_reply_content}")
