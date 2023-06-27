@@ -130,27 +130,36 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
 
     # iterate through the stream of events
     start_time = time.time()
+
+    
+    report = []
+    res_box = st.empty()
     response = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=conversation,
         temperature=0.5,
-        stream=True  # again, we set stream=True
+        stream=True  
     )
     collected_chunks = []
     collected_messages = []
+
+    
     for chunk in response:
-        #chunk_time = time.time() - start_time  # calculate the time delay of the chunk
-        collected_chunks.append(chunk)  # save the event response
-        chunk_message = chunk['choices'][0]['delta']  # extract the message
-        collected_messages.append(chunk_message)  # save the message
-        content=chunk["choices"][0].get("delta",{}).get("content")
-        #st.write(collected_messages)
-        #content=str(content).replace('\n',' ').replace('/n',' ')
-        #st.text({content})
-        #st.write(chunk_message)
-    #st.write(f"Full response received {chunk_time:.2f} seconds after request")
+        #collected_chunks.append(chunk)  # save the event response
+        #chunk_message = chunk['choices'][0]['delta']  # extract the message
+        #collected_messages.append(chunk_message)  # save the message
+        #content=chunk["choices"][0].get("delta",{}).get("content")
+            # join method to concatenate the elements of the list 
+            # into a single string, 
+            # then strip out any empty strings
+
+        report.append(chunk.choices[0].text)
+        result = "".join(report).strip()
+        result = result.replace("\n", "")        
+        res_box.markdown(f'*{result}*') 
+        
     full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
-    st.write(f"Full conversation received: {full_reply_content}")
+    #st.write(f"Full conversation received: {full_reply_content}")
     st.write("Elapsed time:")
     st.write(time.time() - start_time)
     return full_reply_content
