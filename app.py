@@ -17,8 +17,16 @@ from bs4 import BeautifulSoup
 from collections import deque
 from audio_recorder_streamlit import audio_recorder
 
+data_dir = "data"
+print(os.getcwd())
+if os.path.basename(os.getcwd()) != data_dir:
+    os.makedirs(data_dir, exist_ok=True)
+    os.chdir(data_dir)
+
+system_prompt = "You are a helpful assistant.  Follow the user's instructions precisely."
+
 def generate_filename(prompt, file_type):
-    central = pytz.timezone('US/Central')
+    central = pytz.timezone('US/Pacific')
     safe_date_time = datetime.now(central).strftime("%m%d_%I%M")  
     safe_prompt = "".join(x for x in prompt if x.isalnum())[:45]
     return f"{safe_date_time}_{safe_prompt}.{file_type}"
@@ -34,10 +42,10 @@ def transcribe_audio(openai_key, file_path, model):
     if response.status_code == 200:
         st.write(response.json())
         
-        response2 = chat_with_model(response.json().get('text'), '') # *************************************
-        st.write('Responses:')
-        #st.write(response)
-        st.write(response2)
+        # response2 = chat_with_model(response.json().get('text'), '') # *************************************
+        # st.write('Responses:')
+        # #st.write(response)
+        # st.write(response2)
         return response.json().get('text')
     else:
         st.write(response.json())
@@ -122,8 +130,7 @@ def read_file_content(file,max_length):
         return ""
 
 def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
-    model = model_choice
-    conversation = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
+    conversation = [{'role': 'system', 'content': system_prompt}]
     conversation.append({'role': 'user', 'content': prompt})
     if len(document_section)>0:
         conversation.append({'role': 'assistant', 'content': document_section})
@@ -131,7 +138,6 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     # iterate through the stream of events
     start_time = time.time()
 
-    
     report = []
     res_box = st.empty()
 
@@ -139,7 +145,7 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
     collected_messages = []
 
     for chunk in openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
+        model=model_choice,
         messages=conversation,
         temperature=0.5,
         stream=True  
@@ -156,7 +162,7 @@ def chat_with_model(prompt, document_section, model_choice='gpt-3.5-turbo'):
             if len(content) > 0:
                 result = "".join(report).strip()
                 #result = result.replace("\n", "")        
-                res_box.markdown(f'*{result}*') 
+                res_box.markdown(result) 
         except:
             st.write('.')
         
@@ -177,11 +183,15 @@ def chat_with_file_contents(prompt, file_content, model_choice='gpt-3.5-turbo'):
     
 def main():
     # Sidebar and global
-    openai.api_key = os.getenv('OPENAI_KEY')
-    st.set_page_config(page_title="GPT Streamlit Document Reasoner",layout="wide")
+    openai.api_key = os.getenv('OPENAI_API_KEY')
+    st.set_page_config(page_title="Streamlit ChatGPT", layout="wide")
     menu = ["htm", "txt", "xlsx", "csv", "md", "py"]  #619
     choice = st.sidebar.selectbox("Output File Type:", menu)
-    model_choice = st.sidebar.radio("Select Model:", ('gpt-3.5-turbo', 'gpt-3.5-turbo-0301'))
+    model_choice = st.sidebar.radio("Select Model:",
+                                    ('gpt-3.5-turbo', 'gpt-3.5-turbo-16k',
+                                     'gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613',
+                                     'gpt-4', 'gpt-4-0613',
+                                     'gpt-4-32k', 'gpt-4-32k-0613'))
     
     # Audio, transcribe, GPT:
     filename = save_and_play_audio(audio_recorder)
@@ -225,8 +235,8 @@ def main():
                 if st.button(f"Chat about Section {i+1}"):
                     st.write('Reasoning with your inputs...')
                     response = chat_with_model(user_prompt, section, model_choice) # *************************************
-                    st.write('Response:')
-                    st.write(response)
+                    # st.write('Response:')
+                    # st.write(response)
                     document_responses[i] = response
                     filename = generate_filename(f"{user_prompt}_section_{i+1}", choice)
                     create_file(filename, user_prompt, response)
@@ -235,14 +245,14 @@ def main():
     if st.button('💬 Chat'):
         st.write('Reasoning with your inputs...')
         response = chat_with_model(user_prompt, ''.join(list(document_sections,)), model_choice) # *************************************
-        st.write('Response:')
-        st.write(response)
+        # st.write('Response:')
+        # st.write(response)
         
         filename = generate_filename(user_prompt, choice)
         create_file(filename, user_prompt, response)
         st.sidebar.markdown(get_table_download_link(filename), unsafe_allow_html=True)
 
-    all_files = glob.glob("*.*")
+    all_files = glob.iglob("*.*")
     all_files = [file for file in all_files if len(os.path.splitext(file)[0]) >= 20]  # exclude files with short names
     all_files.sort(key=lambda x: (os.path.splitext(x)[1], x), reverse=True)  # sort by file type and file name in descending order
 
@@ -283,8 +293,8 @@ def main():
             st.write('Reasoning with your inputs...')
             #response = chat_with_file_contents(user_prompt, file_contents)
             response = chat_with_model(user_prompt, file_contents, model_choice)
-            st.write('Response:')
-            st.write(response)
+            # st.write('Response:')
+            # st.write(response)
             filename = generate_filename(file_content_area, choice)
             create_file(filename, file_content_area, response)
             st.sidebar.markdown(get_table_download_link(filename), unsafe_allow_html=True)
